@@ -1,0 +1,65 @@
+---
+title: '<center>First Individual Presentation</center>'
+author: "TMRB"
+date: '<img src="images/shape.png" width=100 length=100><br><br> 2024-02-11<br><br> West Chester University'
+output: slidy_presentation
+
+font_adjustment: +1
+footer: 'First Individual Presentation'
+widescreen: yes
+self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(moderndive)
+library(GGally)
+library(olsrr)
+library(MASS)
+library(caret)
+library(car)
+
+data <- read.csv("https://raw.githubusercontent.com/STUD-TMRB/STA/main/321/BankLoanDefaultDataset.csv", header = TRUE)
+```
+
+## Agenda
+
+-   *Title: Predicting Borrower Default status*
+-   *Introduction*
+-   *Data Set Description*
+-   *Research Questions*
+-   *Exploratory Data Analysis*
+-   *Data Split*
+-   *Multiple Logistic Regression*
+-   *k-Fold Cross Validation*
+-   *Discussion*
+-   *Conclusion*
+-   *REFs*
+
+## *Introduction*
+
+-    Big Data has become an inescapable fixture of life. 
+-    It is ubiquitous.
+-    It is valuable. 
+-    According to Segal(2022), big data may take multiple forms, however, generally it may be encapsulated by what are called the "Three V's".
+-    These V's refer to velocity, volume, and variety. Typically, this data source seems vast, it may have no end to its growth, and the information amounts it produces, is where the volume V comes from. 
+-    The velocity V may refer to that data's creation an collection speed. And, the Variety V may refer to the diversity of data points represented in it.
+
+## Dataset Plot
+
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+plot(data)
+```
+
+## Correlations Matrix
+
+Next correlations between the numeric variables that were not turned into factors was assessed. For most of these variables, it seems that there were low amounts of correlation detected and that no variable had a correlation higher than .35. In fact, it seems that Age and Checking_amount, Age and Term, Age and Credit_score, and Age and Saving_amount, accounted for the highest amounts of correlation for each of these variables.
+
+<br><br><br>
+
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+# cor(data[c(2,3,4,12,13,14,15)])
+knitr::kable(cor(data[c(2,3,4,12,13,14,15)]),"pipe",caption = "Correlation Matrix")  
+```
