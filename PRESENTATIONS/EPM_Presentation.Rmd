@@ -1,0 +1,444 @@
+---
+title: '<center>Exploring Predictive Models</center>'
+author: "TMRB"
+date: '<img src="images/magnifying-glass.png" width=100 length=100><br><br> 2024-02-18<br><br> West Chester University'
+output: slidy_presentation
+df_print: paged
+
+font_adjustment: +1
+footer: 'Exploring Predictive Models'
+widescreen: yes
+self_contained: true
+---
+
+<link href="EPM_STYLE.css" rel="stylesheet">
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(moderndive)
+library(GGally)
+library(olsrr)
+library(MASS)
+library(caret)
+library(car)
+
+data <- read.csv("https://raw.githubusercontent.com/STUD-TMRB/STA/main/321/BankLoanDefaultDataset.csv", header = TRUE)
+```
+
+## *Agenda*
+
+-   *Title: Exploring Predictive Models*
+-   *Introduction*
+-   *Data Set Description*
+-   *Research Questions*
+-   *Exploratory Data Analysis*
+-   *Model Selection: Multiple Logistic Regression*
+-   *Data Split*
+-   *k-Fold Cross Validation*
+-   *Discussion*
+-   *Conclusion*
+-   *REFs*
+
+## *Introduction*
+
+-   Big Data has become an inescapable fixture of life.
+-   It is ubiquitous.
+-   It is valuable.
+-   According to Segal(2022), big data may take multiple forms, however, generally it may be encapsulated by what are called the "Three V's". These V's refer to velocity, volume, and variety.
+
+## *Introduction: Three V's*
+
+-   Typically, this data source seems vast, it may have no end to its growth, and the information amounts it produces, is where the volume V comes from.
+-   The velocity V may refer to that data's creation an collection speed.
+-   And, the Variety V may refer to the diversity of data points represented in it.
+
+## *Introduction: Banking*
+
+-   As on might imagine, then, big data, may be intertwined with and a product of daily human interactions. Interactions like those associated with banking. This has not gone unnoticed by the banking industry.
+-   According to Garadis( n.d.), the banking industry is rife with data. Daily transactions may be a prime example of that. The value of that data may be vast and the insights that data may provide may be under-leveraged.
+-   Generally, the data generated and collected with in the industry, may help institutions improve costumer experience through the understandings that it can provide, help them better position their internal interest, and much more. Ultimately, these things may work to increase revenue and/or limit losses.
+
+## *Introduction: Loan default*
+
+-   One may imagine, then, that data concerning loans, a source of revenue for many banking institutions, is highly valued and thoroughly analysed. Especially, information on defaulting.
+-   According to Brozic(2023), Loan default may be considered a label applied by a lender to a borrower, when that borrower, missed or neglected to make payments on a loan provided by that lender within a time period.
+-   Defaulting on a loan is a terrible experience, one that most wish to avoid. It may leave long lasting effects on ones mental health and have consequences that may limit ones quality of life, earning potential, and much more. Consequently, the information gleaned from loan default data may be useful.
+
+## *Data Set Description*
+
+- The data set use is called the "BankLoanDefaultDataset". The Structure of the data set follows.
+- It is taken from the book "Applied Analytics through Case Studies Using SAS and R, Deepti Gupta by APress, ISBN - 978-1-4842-3525-6". It was described where it was posted as, "...a subset of a large o data set. 
+- The structure of the data set is simple. 
+- It can be used for logistic and binary classification / predictive models and algorithms". 
+- Defaut is used as its response variable. There are 1000 observations and 15 variables.
+
+<br><br>
+
+::: {align="center"}
+| Variables                    |                                                        Descriptions |
+|:---------------------------------|-------------------------------------:|
+| Default$(y)$:                | (1 displays bank loan default and 0 displays bank loan non default) |
+| Checking_amount $(x_1)$:     |                                                           (Numeric) |
+| Term $(x_2)$:                |                                     (displayed in months (Numeric)) |
+| Credit_score $(x_3)$:        |                                                           (Numeric) |
+| Gender $(x_4)$:              |                                                       (Categorical) |
+| Marital_status$(x_5)$:       |                                                       (Categorical) |
+| Car_loan $(x_6)$:            |              (1- Own car loan, 0- Does not own car loan -- Numeric) |
+| Personal_loan$(x_7)$:        |    (1- Own Personal loan, 0- Does not own Personal loan -- Numeric) |
+| Home_loan $(x_8)$:           |            (1- Own Home loan, 0- Does not own Home loan -- Numeric) |
+| Education_loan $(x_9)$:      |  (1- Own Education loan, 0- Does not own Education loan -- Numeric) |
+| Emp_status $(x_{10})$:       |                                                       (Categorical) |
+| Amount $(x_{11})$:           |                                                           (Numeric) |
+| Saving_amount $(x_{12})$:    |                                                           (Numeric) |
+| Emp_duration $(x_{13})$:     |                            (which is displayed in months (Numeric)) |
+| Age $(x_{14})$:              |                             (which is displayed in years (Numeric)) |
+| No_of_credit_acc $(x_{15})$: |                                                           (Numeric) |
+:::
+
+## *Research Questions*
+
+::: {align="center"}
+The primary question for this analysis may be how will the explored predictive models perform.
+:::
+
+## *Exploratory Data Analysis*
+
+- Exploratory Data Analysis was conducted. 
+  - Before the models could be explored, they needed to be built. 
+  - Before they could be built, some data set exploration was necessary. 
+- The following is the structure of the data set. 
+  - At the top it may be clearly seen that there were 1000 observations, and 16 variables. 
+  - Default, the response variable, is characterized as an integer object. 
+  - One may also note that several of the variables that were characterized as integers, seem to only posses values 0 and 1. 
+  - Further there were also variables characterized as characters, which seemed to posses at least two categories. 
+  - Both of those variables types were assumed to be factors after exploring summary statistics for each of the variables and the data set description.
+
+<br><br>
+
+## *Exploratory Data Analysis: Data Structure Table*
+
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+str(data)
+```
+
+
+## *Exploratory Data Analysis: Summary Statistics*
+
+- The following represents summary statistics for each of the variables. 
+- as well as a table for the variable No_of_credit_acc bellow the summary output. 
+- Note, that that this variable had only 9 values and was also characterized as an integer. 
+- For those reasons it was also assumed to be a factor variable, and was converted into one. 
+- Lastly, from the summary output it may be noticed that there were no missing values in the data set.
+
+
+## *Exploratory Data Analysis: Data*
+
+### *Data Summary*
+
+::: {align="center"}
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+
+knitr::kable(t(summary(data)),caption = "FREQ Counts for No_of_credit_acc")
+```
+:::
+
+<br><br>
+
+### *FREQ Table: No_of_credit_acc*
+
+::: {align="center"}
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+knitr::kable(table(data$No_of_credit_acc),caption = "FREQ Counts for No_of_credit_acc")
+
+```
+:::
+
+## *Exploratory Data Analysis: Response Variable*
+
+- Next the Response variable was explored. 
+- From the previous information it may be clear that it is a binary variable which used the values 0 and 1 to encode a burrowers loan default status. 
+- A proportion table of the frequency for this two levels follows. 
+- From it, it may be clear that there are 7/3 more borrowers that did not default than that did. 
+- Note that the response variable is a binary factor variable that was stored as an integer, with the integer 1 associated bank loan default, so $P(Y=1|X)=P(Default=1|X)$.
+
+
+## *Exploratory Data Analysis: Response Variable Proportion Table*
+
+::: {align="center"}
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+# prop.table(table(data$Default))  
+knitr::kable(prop.table(table(data$Default))  ,caption = "Prop FREQ Counts:Default")            
+```
+:::
+
+## *Exploratory Data Analysis: Correlations*
+
+- Next correlations between the numeric variables that were not turned into factors was assessed. 
+- For most of these variables, it seems that there were low amounts of correlation detected and that no variable had a correlation higher than .35. 
+- In fact, it seems that Age and Checking_amount, Age and Term, Age and Credit_score, and Age and Saving_amount, accounted for the highest amounts of correlation for each of these variables.
+
+
+## *Exploratory Data Analysis: Correlations Matrix*
+
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+# cor(data[c(2,3,4,12,13,14,15)])
+knitr::kable(cor(data[c(2,3,4,12,13,14,15)])  ,caption = "Correlations Matrix")  
+```
+
+## *Exploratory Data Analysis: Variables Transformations*
+
+::: {align="center"}
+Lastly, after the variables were transformed into factors, the data set was reexamined. The following is a print out of that information.
+:::
+
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+data0 <-  data
+data0$Default <- as.factor(data0$Default)
+data0$Gender <- as.factor(data0$Gender)
+data0$Marital_status <- as.factor(data0$Marital_status)
+data0$Car_loan <- as.factor(data0$Car_loan)
+data0$Personal_loan <- as.factor(data0$Personal_loan)
+data0$Home_loan <- as.factor(data0$Home_loan)
+data0$Education_loan <- as.factor(data0$Education_loan)
+data0$Emp_status <- as.factor(data0$Emp_status)
+data0$No_of_credit_acc <- as.factor(data0$No_of_credit_acc)
+
+str(data0)
+```
+
+
+
+
+
+
+
+## *Model Selection: Multiple Logistic Regression*
+
+- Before training the predictive models and exploring their performance, the models had to be built. 
+- Simple criteria was used to do that. 
+  - The first model contains all variables from the data set. 
+  - The Second model contains only those variables which were found to be statistically significant in the first model. 
+  - The third model was produced using an automated process. Specifically, an automatic variable selection procedure, its choice of final model is based on an AIC value that has been minimized the most by a particular model.
+
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+#performed multiple log regression
+mod0 <-  glm(Default~.,family=binomial(link = "logit"),data=data0)
+mod0.sum <-summary(mod0)
+# mod0.sum
+mod1 <-  glm(Default~Checking_amount+Term+Credit_score+Saving_amount+Age,family=binomial(link = "logit"),data=data0)
+mod1.sum <-summary(mod1)
+# mod1.sum
+mod2 <- stepAIC(mod0,direction="both",trace = 0)
+mod2.sum <-summary(mod2)
+# mod2.sum
+```
+
+
+## *Model Selection: Multicolinearity*
+
+- After the models were built multicolinearity was explored within each model using variable inflation factors. 
+- The following output displays that information for each model. For models 2 and 3, none of the variables crawled much from one. 
+- The same may be said for model 1. 
+- However, for each of the loan types, even after adjustment, these values were all greater than three some were even greater than 9. 
+- Why this is the case is unknown. 
+- However, after exploring the raw data, it was found that all observations had at most one type of loan. 
+- Output of the model summarry is withheld; the models were not used to make inferences about Default.
+
+## *Model Selection: GVIF Model 1*
+
+::: {align="center"}
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+# generalized variance inflation factors
+knitr::kable(vif(mod0),caption = "VIF: Model 1") 
+```
+:::
+
+
+## *Model Selection: GVIF Model 2*
+
+::: {align="center"}
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+knitr::kable(vif(mod1),caption = "VIF: Model 2")
+```
+:::
+
+
+## *Model Selection: GVIF Model 3*
+
+::: {align="center"}
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+knitr::kable(vif(mod2),caption = "VIF: Model 3")
+```
+:::
+
+
+
+```{r echo=F, include=F,comment='',warning=FALSE,message=FALSE}
+mod0.coef = summary(mod0)$coef
+mod0.coef.ci = confint(mod0)
+mod0.coef.or = exp(mod0$coef)
+sum.stats0 = cbind(mod0.coef,mod0.coef.ci,odds.ratio = mod0.coef.or)
+
+mod1.coef = summary(mod1)$coef
+mod1.coef.ci = confint(mod1)
+mod1.coef.or = exp(mod1$coef)
+sum.stats1 = cbind(mod1.coef,mod1.coef.ci,odds.ratio = mod1.coef.or)
+
+mod2.coef = summary(mod2)$coef
+mod2.coef.ci = confint(mod2)
+mod2.coef.or = exp(mod2$coef)
+sum.stats2 = cbind(mod2.coef,mod2.coef.ci,odds.ratio = mod2.coef.or)
+
+knitr::kable(sum.stats0,caption = "MODEL FULL: Estimates,95% CI, OR",digits = 2)
+knitr::kable(sum.stats1,caption = "MODEL REDUCED: Estimates,95% CI, OR",digits = 2)
+knitr::kable(sum.stats2,caption = "MODEL AUTO: Estimates,95% CI, OR",digits = 2)
+```
+
+## *Data Split*
+
+- After MLR was conducted, The three models were cross-validated using k Fold Cross Validation. 
+- Their predictive error and and accuracy were stored after each was fit. 
+  - This was done five times. 
+  - The average of these five iterations for the predictive error and accuracy were stored and then output to tables. 
+
+<br><br>
+
+The following is tabular output of the quantities of observations in each non overlapping partition employed in the k Fold Cross Validation procedure.
+
+<br><br>
+
+### *Fold Quantities*
+
+::: {align="center"}
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+#Data Split
+# number of observations
+n <- nrow(data0)
+
+# doing 5-fold CV
+k <- 5
+
+folds <- sample(1:k, n, replace = TRUE)
+# table(folds)
+knitr::kable(table(folds), caption="Fold Quantities",digits = 4)
+```
+:::
+
+## *k-Fold Cross Validation*
+
+- Tabular output from the 5-Fold Cross Validation procedure follows. 
+  - the first table should contain the average predictive errors from each model. 
+  - *Note, PE1, PE2, and PE3 should represent the full, reduced, and auto models respectively.* 
+  - Likewise ACC1, ACC2, and ACC3, which should represent the average accuracy of each model, follows that same order. 
+- The final model was chosen based on greatest minimized predictive error. 
+- The cut-off probability used to dichotomize each models predictions for later assessment was .5.
+
+<br><br>
+
+
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+PE1 = rep(0,5)
+PE2 = rep(0,5)
+PE3 = rep(0,5)
+ACC1 = rep(0,5)
+ACC2 = rep(0,5)
+ACC3 = rep(0,5)
+
+
+for(i in 1:k)
+{
+  
+# all observations in fold i are held out for the test set (i.e. not used to train the model)  
+ted <- data0[folds == i, ]
+
+# use all observations NOT in fold i to train the model
+trd <- data0[folds != i, ] 
+
+## model full
+mod0 <-  glm(Default~.,family=binomial(link = "logit"),data=trd)
+## model reduced 
+mod1 <-  glm(Default~Checking_amount+Term+Credit_score+Saving_amount+Age,family=binomial(link = "logit"),data=trd)
+## model auto
+mod2  <-  glm(Default~Checking_amount+Term+Credit_score+Personal_loan+Home_loan+Education_loan+Emp_status+Amount+Saving_amount+Age,family=binomial(link = "logit"),data=trd)
+
+## predicted probabilities of each candidate model
+pred01 = predict(mod0, newdata = ted, type="response")
+pred02 = predict(mod1, newdata = ted, type="response")
+pred03 = predict(mod2, newdata = ted, type="response")
+
+## confusion matrix: ftable() will
+confusion.matrix01 <- ftable(ifelse((pred01>0.5),"T+","T-"),ifelse((ted$Default==1),"D+","D-"))
+confusion.matrix02 <- ftable(ifelse((pred02>0.5),"T+","T-"),ifelse((ted$Default==1),"D+","D-"))
+confusion.matrix03 <- ftable(ifelse((pred03>0.5),"T+","T-"),ifelse((ted$Default==1),"D+","D-"))
+
+PE1[i] <- (confusion.matrix01[1,2] + confusion.matrix01[2,1])/length(pred01)
+PE2[i] <- (confusion.matrix02[1,2] + confusion.matrix02[2,1])/length(pred02)
+PE3[i] <- (confusion.matrix03[1,2] + confusion.matrix03[2,1])/length(pred03)
+ACC1[i] <- 1-((confusion.matrix01[1,2] + confusion.matrix01[2,1])/length(pred01))
+ACC2[i] <- 1-((confusion.matrix02[1,2] + confusion.matrix02[2,1])/length(pred02))
+ACC3[i] <- 1-((confusion.matrix03[1,2] + confusion.matrix03[2,1])/length(pred03))
+}
+```
+
+### *Average prediction errors*
+
+::: {align="center"}
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+avg.pe = cbind(PE1 = mean(PE1), PE2 = mean(PE2), PE3 = mean(PE3))
+knitr::kable(avg.pe, caption = "Average prediction errors",digits = 4)
+```
+:::
+
+<br><br>
+
+### *Average prediction accuracy*
+
+::: {align="center"}
+```{r echo=F, include=T,comment='',warning=FALSE,message=FALSE}
+avg.acc = cbind(ACC1 = mean(ACC1), ACC2 = mean(ACC2), ACC3 = mean(ACC3))
+knitr::kable(avg.acc, caption="Average prediction accuracy",digits = 4)
+```
+:::
+
+## *Discussion: Results*
+
+- The predictive abilities of three models was explored. 
+- Ultimately, these abilities were quantified in the predictive error of each model and then these errors were compared. 
+- It was found that the predictive error of model three was the lowest. 
+- However, each models predictive error did not differ by much. 
+  
+
+## *Discussion: Process*
+
+- To get these predicitive errors, 5-Fold Cross Validation was used each model fitted with training data. 
+  - At each iteration, test data with held from the model training, was used to compare predictions made by each model. 
+  - The cut-off probability used to dichotomize each models predictions for later assessment was .5.
+- Exploratory data analysis was conducted before each models predictive abilities were explored. 
+  - Durring that exploration, categorical and pseudo-categorical variables were transformed into factors. 
+  - Multicolinearity within each model was also explored. For models 2 and 3, none was found. 
+  - The same may be said for model 1. 
+    - However, for each of the loan types, even after adjustment, these variables had high GVIF values. Why this was the case was unknown.       - However, note that all observations had at most one type of loan. 
+  - Correlations between the numeric variables that were not turned into factors was assessed as well. low amounts were found.
+
+## *Discussion: Models*
+
+The models were not used to make inferences, so no output of the model summary or interpretations were given. 
+
+- The first model contained all variables from the data set. 
+- The Second model contained only those variables which were found to be statistically significant in the first model. 
+- The third model was produced using automatic variable selection, its choice of final model is based on an AIC value that has been minimized the most by a particular model. 
+
+Note that both the automatic model and 2nd model might have differed with each iteration of k-Fold Cross Validation, based on their selection criteria. That is, if the full model was fitted with training data from differing folds, it may have produced a reduced model that could be entirely different from model 2. The same can be said for model 3.
+
+## *Conclusion*
+
+Predictive Error among the three models did not differ by much. However, if one was to pick a model for prediction based on lowest predictive error, one might choose the third model. Further research might be directed to exploring the cause of the high GVIF values in model 1.
+
+## *REFs*
+
+-   <cite> Garadis, P. (n.d.). Modern Data Analytics in Banking: Benefits, Outlook & More. Retrieved from Hitachi Solutions: <https://global.hitachi-solutions.com/blog/big-data-banking/></cite>
+-   <cite> Qureshi, A. (n.d.). Data Retention Policy 101: Best Practices, Examples & More [with Template]. Retrieved August 07, 2021, from <https://www.intradyn.com/data-retention-policy/></cite>
+-   <cite> Segal, T. (2022, November 29). What Is Big Data? Definition, How It Works, and Uses. Retrieved from investopedia: <https://www.investopedia.com/terms/b/big-data.asp></cite>
+

@@ -1,0 +1,141 @@
+/*
+Custom CSS template for ioslides
+
+Author: Matteo Courthoud
+Repo: https://github.com/matteocourthoud/ioslides-theme
+*/
+
+/* Import google fonts 
+@import url('https://fonts.googleapis.com/css?family=Lora|Open+Sans&display=swap'); */
+
+html, body {
+  background-color:#cee5e1; /*slide background*/
+  font-family: Georgia,"Times New Roman", Times, serif;
+  font-size: 33px;
+  color:  #1C0123; /* The regular text color. */
+  /*
+  background-color:#E3DED7
+  background-color:#5ABF8C
+  background-color:#8EAD7C
+  background-color:#2D4443
+  background-color:#FF4C16
+  background-color:#1C0123
+  */
+  
+}
+
+p {
+  font-size: 33px;
+  
+}
+
+/* Header: change color */
+h1 {
+  color: #28024c !important;
+  font-family: "Times New Roman", Times, serif;
+  /*font-variant: small-caps; */ 
+  text-align: left;
+    /*padding: 10px 50px 10px 50px;   top right bottom left  */ 
+    /*margin: 125px 50px 75px 50px; */  
+    margin-top: 50px;
+}
+h2 {
+  color: #28024c !important;
+  font-family: "Times New Roman", Times, serif;
+  text-align: center;
+    padding: 10px 50px 10px 50px;   /*top right bottom left  */
+    /*margin: 125px 50px 75px 50px; */  
+    margin-top: 20px;
+}
+h3 {
+  color: #fff  !important;
+  text-align: center;
+    padding: 5px;
+    margin-top: 10px;
+}
+h4 {
+  color: #fff  !important;
+  text-align: center;
+    padding: 5px;
+    margin-top: 10px;
+}
+h5 {
+  color: #fff  !important;
+  text-align: center;
+    padding: 5px;
+    margin-top: 10px;
+}
+
+
+/* Unordered list style */
+/* First level */
+ul > li:before {
+  content: ' ';
+}
+ul > li {
+  list-style-type: square;
+  color:  #1C0123;
+  font-size: 33px;
+}
+/* Second level */
+ul > li > ul > li:before {
+  content: ' ';
+}
+ul > li > ul > li {
+  list-style-type: circle;
+  color:  #2f013a;
+  font-size: 33px;
+}
+/* Third level */
+ul > li > ul > li > ul > li:before {
+  content: ' ';
+
+}
+ul > li > ul > li > ul > li {
+  list-style-type: lower-roman;
+  font-size: 33px;
+  color: #430254;
+  
+}
+
+img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 25px;
+  max-width: 100%;
+}
+
+/* Citations: colored */
+cite {
+  color: #2D4443;
+}
+
+
+/**********************
+   Link text decoration
+***********************/
+/* unvisited link */
+a:link {
+  color: #8EAD7C;
+}
+/* visited link */
+a:visited {
+  color: #5ABF8C;
+}
+/* mouse over link */
+a:hover {
+  color: #FF4C16;
+}
+/* selected link */
+a:active {
+  color: #1C0123;
+}
+.p{
+  background-color:#E3DED7
+  background-color:#5ABF8C
+  background-color:#8EAD7C
+  background-color:#2D4443
+  background-color:#FF4C16
+  background-color:#1C0123 
+}
